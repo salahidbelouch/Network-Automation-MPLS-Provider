@@ -1,0 +1,65 @@
+{
+    "topo": {
+        "name": "BGP OSPF",
+        "routers": [
+            {
+                "ID": "1.1.1.1",
+                "ospf": 0,
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/0",
+                        "ip_address": "10.0.0.2",
+                        "subnet_mask": "255.255.255.252"
+                    },
+                    {
+                        "name": "GigabitEthernet0/1",
+                        "ip_address": "10.0.1.2",
+                        "subnet_mask": "255.255.255.252"
+                    }
+                ],
+                "bgp": {
+                    "as": 1,
+                    "neighbors": [
+                        {
+                            "name": "CE",
+                            "ip_address": "10.0.1.1",
+                            "as": 2
+                        }
+                    ]
+                }
+            },
+            {
+                "ID": "2.2.2.2",
+                "ospf": 0,
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/0",
+                        "ip_address": "10.0.0.1",
+                        "subnet_mask": "255.255.255.252"
+                    }
+                ]
+                
+            },
+            {
+                "name": "CE",
+                "interfaces": [
+                    {
+                        "name": "GigabitEthernet0/0",
+                        "ip_address": "10.0.1.1",
+                        "subnet_mask": "255.255.255.252"
+                    }
+                ],
+                "bgp": {
+                    "as": 2,
+                    "neighbors": [
+                        {
+                            "name": "10.10.10.10",
+                            "ip_address": "10.0.1.2",
+                            "as": 1
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
