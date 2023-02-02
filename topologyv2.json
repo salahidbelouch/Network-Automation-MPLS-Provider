@@ -1,8 +1,8 @@
-{
+={
     "topo": {
         "name": "Basics",
         "routers": [
-            {   
+            { 
                 "name" : "PE1",
                 "ID": "1.1.1.1",
                 "ospf": 0,
