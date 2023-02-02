@@ -1,0 +1,41 @@
+{
+    "Project_name": "NAS",
+    "P1": {
+        "interfaces":[
+            {
+                "InterfaceName": "Loopback0",
+                "Address": ["3.3.3.3","255.255.255.255"],
+                "OSPF": 0
+              },
+              {
+                "InterfaceName": "GigabitEthernet1/0",
+                "With": "P2",
+                "Address": ["192.168.101.1","255.255.255.0"],
+                "OSPF": 0,
+                "MPLS": true
+              },
+              {
+                "InterfaceName": "GigabitEthernet2/0",
+                "With": "PE1",
+                "Address": [
+                  "192.168.100.2",
+                  "255.255.255.0"
+                ],
+                "OSPF": 0,
+                "MPLS": true
+              },
+              {
+                "InterfaceName": "GigabitEthernet3/0",
+                "With": "P3",
+                "Address": [
+                  "192.168.102.1",
+                  "255.255.255.0"
+                ],
+                "OSPF": 0,
+                "MPLS": true
+              }
+        ],
+    "OSPF_id": "3.3.3.3",
+    "ipcef": true
+    }
+}
