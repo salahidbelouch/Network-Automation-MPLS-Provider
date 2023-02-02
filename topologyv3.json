@@ -1,5 +1,6 @@
 {
     "Project_name": "NAS",
+    "routers":[{
     "P1": {
         "interfaces":[
             {
@@ -38,4 +39,6 @@
     "OSPF_id": "3.3.3.3",
     "ipcef": true
     }
+}
+]
 }
