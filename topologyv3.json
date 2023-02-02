@@ -1,39 +1,190 @@
 {
     "Project_name": "NAS",
-    "routers":[{
-    "P1": {
-        "router_name": "P1",
-        "interfaces":[
+    "routers":[
+        {
+            "P1": {
+                "router_name": "P1",
+                "interfaces":[
+                    {
+                        "InterfaceName": "Loopback0",
+                        "Address": ["5.5.5.5","255.255.255.255"],
+                        "OSPF": 0
+                    },
+                    {
+                        "InterfaceName": "GigabitEthernet1/0",
+                        "With": "PE1",
+                        "Address": ["10.0.0.1","255.255.255.0"],
+                        "OSPF": 0,
+                        "MPLS": true
+                    },
+                    {
+                        "InterfaceName": "GigabitEthernet2/0",
+                        "With": "P3",
+                        "Address": ["10.0.8.1","255.255.255.0"],
+                        "OSPF": 0,
+                        "MPLS": true
+                    },
+                    {
+                        "InterfaceName": "GigabitEthernet3/0",
+                        "With": "P2",
+                        "Address": ["10.0.10.1","255.255.255.0"],
+                        "OSPF": 0,
+                        "MPLS": true
+                    }
+                ],
+            "OSPF_id": "5.5.5.5",
+            "ipcef": true
+                }
+        },
+        {
+            "P2": {
+                "router_name": "P2",
+                "interfaces":[
+                    {
+                        "InterfaceName": "Loopback0",
+                        "Address": ["6.6.6.6","255.255.255.255"],
+                        "OSPF": 0
+                    },
+                    {
+                        "InterfaceName": "GigabitEthernet1/0",
+                        "With": "PE2",
+                        "Address": ["10.0.2.1","255.255.255.0"],
+                        "OSPF": 0,
+                        "MPLS": true
+                    },
+                    {
+                        "InterfaceName": "GigabitEthernet2/0",
+                        "With": "P4",
+                        "Address": ["10.0.9.1","255.255.255.0"],
+                        "OSPF": 0,
+                        "MPLS": true
+                    },
+                    {
+                        "InterfaceName": "GigabitEthernet3/0",
+                        "With": "P1",
+                        "Address": ["10.0.10.2","255.255.255.0"],
+                        "OSPF": 0,
+                        "MPLS": true
+                    }
+                ],
+            "OSPF_id": "6.6.6.6",
+            "ipcef": true
+                }
+        },
+        {
+            "P3": {
+                "router_name": "P3",
+                "interfaces":[
+                    {
+                        "InterfaceName": "Loopback0",
+                        "Address": ["7.7.7.7","255.255.255.255"],
+                        "OSPF": 0
+                    },
+                    {
+                        "InterfaceName": "GigabitEthernet1/0",
+                        "With": "P1",
+                        "Address": ["10.0.8.2","255.255.255.0"],
+                        "OSPF": 0,
+                        "MPLS": true
+                    },
+                    {
+                        "InterfaceName": "GigabitEthernet2/0",
+                        "With": "PE3",
+                        "Address": ["10.0.4.1","255.255.255.0"],
+                        "OSPF": 0,
+                        "MPLS": true
+                    },
+                    {
+                        "InterfaceName": "GigabitEthernet3/0",
+                        "With": "P4",
+                        "Address": ["10.0.11.1","255.255.255.0"],
+                        "OSPF": 0,
+                        "MPLS": true
+                    }
+                ],
+            "OSPF_id": "7.7.7.7",
+            "ipcef": true
+                }
+            },
             {
-                "InterfaceName": "Loopback0",
-                "Address": ["5.5.5.5","255.255.255.255"],
-                "OSPF": 0
-              },
-              {
-                "InterfaceName": "GigabitEthernet1/0",
-                "With": "PE1",
-                "Address": ["10.0.0.1","255.255.255.0"],
-                "OSPF": 0,
-                "MPLS": true
-              },
-              {
-                "InterfaceName": "GigabitEthernet2/0",
-                "With": "P3",
-                "Address": ["10.0.8.1","255.255.255.0"],
-                "OSPF": 0,
-                "MPLS": true
-              },
-              {
-                "InterfaceName": "GigabitEthernet3/0",
-                "With": "P2",
-                "Address": ["10.0.10.1","255.255.255.0"],
-                "OSPF": 0,
-                "MPLS": true
-              }
-        ],
-    "OSPF_id": "5.5.5.5",
-    "ipcef": true
-    }
-}
+                "P4": {
+                    "router_name": "P4",
+                    "interfaces":[
+                        {
+                            "InterfaceName": "Loopback0",
+                            "Address": ["8.8.8.8","255.255.255.255"],
+                            "OSPF": 0
+                        },
+                        {
+                            "InterfaceName": "GigabitEthernet1/0",
+                            "With": "P2",
+                            "Address": ["10.0.9.2","255.255.255.0"],
+                            "OSPF": 0,
+                            "MPLS": true
+                        },
+                        {
+                            "InterfaceName": "GigabitEthernet2/0",
+                            "With": "PE4",
+                            "Address": ["10.0.6.1","255.255.255.0"],
+                            "OSPF": 0,
+                            "MPLS": true
+                        },
+                        {
+                            "InterfaceName": "GigabitEthernet3/0",
+                            "With": "P3",
+                            "Address": ["10.0.11.2","255.255.255.0"],
+                            "OSPF": 0,
+                            "MPLS": true
+                        }
+                    ],
+                "OSPF_id": "8.8.8.8",
+                "ipcef": true
+                    }
+                },
+                {
+                    "PE1": {
+                        "router_name": "PE1",
+                        "interfaces":[
+                            {
+                                "InterfaceName": "Loopback0",
+                                "Address": ["1.1.1.1","255.255.255.255"],
+                                "OSPF": 0
+                            },
+                            {
+                                "InterfaceName": "GigabitEthernet1/0",
+                                "With": "P1",
+                                "Address": ["10.0.0.2","255.255.255.0"],
+                                "OSPF": 0,
+                                "MPLS": true
+                            },
+                            {
+                                "InterfaceName": "GigabitEthernet2/0",
+                                "With": "CE1",
+                                "Address": ["10.0.1.2","255.255.255.0"],
+                            }
+                        ],
+                    "OSPF_id": "1.1.1.1",
+                    "BGP": {
+                        "AS": "1",
+                        "neighbors": [{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "4.4.4.4"},{"AS": 2,"addr": "10.0.1.1"}],
+                        "neighbors_ipv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"},{"addr": "1.0.1.1"}],
+                        "neighbors_vpnv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"}],
+                        "neighbors_vrf": [
+                        {"VRF": "as2",
+                        "neighbors":[{"AS":"2","addr":"10.0.1.1"}]}]
+                    },
+                    "VRF": [
+                        {
+                        "name": "as2",
+                        "rd": "1:1",
+                        "rt_import": ["1:10"],
+                        "rt_export": ["1:10"]
+                        }],
+                    "ipcef": true
+                        }
+                    }
+
+
+
 ]
 }
