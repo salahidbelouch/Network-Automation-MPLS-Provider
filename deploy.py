@@ -54,12 +54,15 @@ for template in server.get_templates():
 for node in projet.nodes:
     print(f"Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
     tn = telnetlib.Telnet("10.56.67.183", node.console)
+    
     #Première implem Initialisation 
+
     tn.write(b"\r")
     tn.write(b"end\r")
     time.sleep(0.3)
 
     #Implementation OSPF par routeur
+
     routeur=topo_data["routers"][node.name]
     if "OSPF_id" in routeur:
         tn.write(b"conf t\r")
@@ -73,6 +76,7 @@ for node in projet.nodes:
         tn.write(b"end\r")
         time.sleep(0.3)
 
+    # Implementation interface par interface des parametres
 
     for int in routeur["interfaces"]:
 
@@ -93,12 +97,16 @@ for node in projet.nodes:
 
         tn.write(b"end\r")
         
+        #OSPF
+
         if "OSPF" in int:
             tn.write(b"conf t\r")
             tn.write(b"int "+bytes(int["Interface"], "utf-8")+b"\r")
             tn.write(b"ip ospf 10 area " +
                      bytes(str(int["OSPF"]), "utf-8")+b"\r")
             tn.write(b"end\r")
+        
+        #MPLS
 
         if "MPLS" in int:
             tn.write(b"conf t\r")
@@ -108,6 +116,30 @@ for node in projet.nodes:
             tn.write(b"mpls label protocol ldp\r")
             tn.write(b"end\r")
 
+    #BGP
+    if "BGP" in routeur:
+        AS=routeur["BGP"]["AS"]
+        tn.write(b"end\r")  
+        tn.write(b"conf t\r")
+        tn.write(f"router bgp {AS}\r".encode())
+        tn.write(b"bgp log-neighbor-changes\r")
+        if "redistribute" in routeur["BGP"]:
+            tn.write(b"redistribute connected\r")
+        tn.write(b"end\r")
+        time.sleep(0.5)
+        tn.write(b"bgp log-neighbor-changes\r")
+
+        if "Neighbors" in routeur["BGP"]:
+            tn.write(b"end\r")  
+            tn.write(b"conf t\r")
+            tn.write(f"router bgp {AS}\r".encode())
+            Neighbors=routeur["BGP"]["Neighbors"]
+            for neighbor in Neighbors:
+                tn.write(f"neighbor {neighbor['addr']} remote-as {neighbor['AS']}\r".encode())
+                tn.write(f"neighbor {neighbor['addr']} update-source Loopback 0\r".encode()) 
+                time.sleep(0.5)
+ 
+ 
     # node.start()
 
 

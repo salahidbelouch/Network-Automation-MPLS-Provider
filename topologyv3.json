@@ -155,12 +155,12 @@
                     "OSPF_id": "1.1.1.1",
                     "BGP": {
                         "AS": "1",
-                        "neighbors": [{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "4.4.4.4"},{"AS": 2,"addr": "10.0.1.1"}],
-                        "neighbors_ipv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"},{"addr": "10.0.1.1"}],
-                        "neighbors_vpnv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"}],
-                        "neighbors_vrf": [
+                        "Neighbors": [{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "4.4.4.4"},{"AS": 2,"addr": "10.0.1.1"}],
+                        "ipv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"},{"addr": "10.0.1.1"}],
+                        "vpnv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"}],
+                        "v_vrf": [
                         {"VRF": "as2",
-                        "neighbors":[{"AS":"2","addr":"10.0.1.1"}]}]
+                        "Neighbors":[{"AS":"2","addr":"10.0.1.1"}]}]
                     },
                     "VRF": [
                         {
@@ -195,12 +195,12 @@
                     "OSPF_id": "2.2.2.2",
                     "BGP": {
                         "AS": "1",
-                        "neighbors": [{"AS": 1,"addr": "1.1.1.1"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "4.4.4.4"},{"AS": 3,"addr": "10.0.3.1"}],
-                        "neighbors_ipv4": [{"addr": "1.1.1.1"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"},{"addr": "10.0.3.1"}],
-                        "neighbors_vpnv4": [{"addr": "1.1.1.1"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"}],
-                        "neighbors_vrf": [
+                        "Neighbors": [{"AS": 1,"addr": "1.1.1.1"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "4.4.4.4"},{"AS": 3,"addr": "10.0.3.1"}],
+                        "ipv4": [{"addr": "1.1.1.1"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"},{"addr": "10.0.3.1"}],
+                        "vpnv4": [{"addr": "1.1.1.1"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"}],
+                        "v_vrf": [
                         {"VRF": "as3",
-                        "neighbors":[{"AS":"3","addr":"10.0.3.1"}]}]
+                        "Neighbors":[{"AS":"3","addr":"10.0.3.1"}]}]
                     },
                     "VRF": [
                         {
@@ -235,12 +235,12 @@
                     "OSPF_id": "3.3.3.3",
                     "BGP": {
                         "AS": "1",
-                        "neighbors": [{"AS": 1,"addr": "1.1.1.1"},{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "4.4.4.4"},{"AS": 3,"addr": "10.0.5.1"}],
-                        "neighbors_ipv4": [{"addr": "1.1.1.1"},{"addr": "2.2.2.2"},{"addr": "4.4.4.4"},{"addr": "10.0.5.1"}],
-                        "neighbors_vpnv4": [{"addr": "1.1.1.1"},{"addr": "2.2.2.2"},{"addr": "4.4.4.4"}],
-                        "neighbors_vrf": [
+                        "Neighbors": [{"AS": 1,"addr": "1.1.1.1"},{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "4.4.4.4"},{"AS": 3,"addr": "10.0.5.1"}],
+                        "ipv4": [{"addr": "1.1.1.1"},{"addr": "2.2.2.2"},{"addr": "4.4.4.4"},{"addr": "10.0.5.1"}],
+                        "vpnv4": [{"addr": "1.1.1.1"},{"addr": "2.2.2.2"},{"addr": "4.4.4.4"}],
+                        "v_vrf": [
                         {"VRF": "as3",
-                        "neighbors":[{"AS":"3","addr":"10.0.5.1"}]}]
+                        "Neighbors":[{"AS":"3","addr":"10.0.5.1"}]}]
                     },
                     "VRF": [
                         {
@@ -275,12 +275,12 @@
                 "OSPF_id": "4.4.4.4",
                 "BGP": {
                     "AS": "1",
-                    "neighbors": [{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "1.1.1.1"},{"AS": 2,"addr": "10.0.7.1"}],
-                    "neighbors_ipv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "1.1.1.1"},{"addr": "10.0.7.1"}],
-                    "neighbors_vpnv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "1.1.1.1"}],
-                    "neighbors_vrf": [
+                    "Neighbors": [{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "1.1.1.1"},{"AS": 2,"addr": "10.0.7.1"}],
+                    "ipv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "1.1.1.1"},{"addr": "10.0.7.1"}],
+                    "vpnv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "1.1.1.1"}],
+                    "v_vrf": [
                     {"VRF": "as2",
-                    "neighbors":[{"AS":"2","addr":"10.0.7.1"}]}]
+                    "Neighbors":[{"AS":"2","addr":"10.0.7.1"}]}]
                 },
                 "VRF": [
                     {
@@ -301,7 +301,7 @@
                 "BGP": {
                     "AS": "2",
                     "redistribute":true,
-                    "neighbors": [{"AS": 1,"addr": "10.0.1.2"}]
+                    "Neighbors": [{"AS": 1,"addr": "10.0.1.2"}]
                 },
                 "ipcef": true
                 },
@@ -315,7 +315,7 @@
                 "BGP": {
                     "AS": "3",
                     "redistribute":true,
-                    "neighbors": [{"AS": 1,"addr": "10.0.3.2"}]
+                    "Neighbors": [{"AS": 1,"addr": "10.0.3.2"}]
                 },
                 "ipcef": true
                 },
@@ -329,7 +329,7 @@
                 "BGP": {
                     "AS": "3",
                     "redistribute":true,
-                    "neighbors": [{"AS": 1,"addr": "10.0.5.2"}]
+                    "Neighbors": [{"AS": 1,"addr": "10.0.5.2"}]
                 },
                 "ipcef": true
                 },
@@ -343,7 +343,7 @@
                 "BGP": {
                     "AS": "2",
                     "redistribute":true,
-                    "neighbors": [{"AS": 1,"addr": "10.0.7.2"}]
+                    "Neighbors": [{"AS": 1,"addr": "10.0.7.2"}]
                 },
                 "ipcef": true
                 }
