@@ -124,7 +124,7 @@ for node in projet.nodes:
             tn.write(b"end\r")
 
     #VRF
-     if "VRF" in routeur:
+    if "VRF" in routeur:
         for VRF in routeur["VRF"]:
 
             NAME=VRF["name"]
