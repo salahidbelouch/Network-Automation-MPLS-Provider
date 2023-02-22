@@ -6,7 +6,7 @@ import time
 import telnetlib
 
 ### Connect to the GNS3 server
-server = gns3fy.Gns3Connector("http://10.56.67.183:3080")
+server = gns3fy.Gns3Connector("http://10.36.67.183:3080")
 
 # Verif -----
 
@@ -53,7 +53,7 @@ for template in server.get_templates():
 
 for node in projet.nodes:
     print(f"Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
-    tn = telnetlib.Telnet("10.56.67.183", node.console)
+    tn = telnetlib.Telnet("10.36.67.183", node.console)
     
     #Première implem Initialisation 
 
@@ -61,9 +61,16 @@ for node in projet.nodes:
     tn.write(b"end\r")
     time.sleep(0.3)
 
+    tn.write(b"\r")
+    tn.write(b"end\r")
+    tn.write(b"conf t\r")
+    tn.write(f"hostname {router}\r".encode())
+    tn.write(b"end\r")
+    time.sleep(0.3)
+
     #Implementation OSPF par routeur
 
-    routeur=topo_data["routers"][node.name]
+    routeur=topo_data[node.name]
     if "OSPF_id" in routeur:
         tn.write(b"conf t\r")
         tn.write(b"router ospf 10\r")
@@ -116,6 +123,9 @@ for node in projet.nodes:
             tn.write(b"mpls label protocol ldp\r")
             tn.write(b"end\r")
 
+
+
+
     #BGP
     if "BGP" in routeur:
         AS=routeur["BGP"]["AS"]
@@ -126,8 +136,7 @@ for node in projet.nodes:
         if "redistribute" in routeur["BGP"]:
             tn.write(b"redistribute connected\r")
         tn.write(b"end\r")
-        time.sleep(0.5)
-        tn.write(b"bgp log-neighbor-changes\r")
+        time.sleep(0.3)
 
         if "Neighbors" in routeur["BGP"]:
             tn.write(b"end\r")  
@@ -137,9 +146,46 @@ for node in projet.nodes:
             for neighbor in Neighbors:
                 tn.write(f"neighbor {neighbor['addr']} remote-as {neighbor['AS']}\r".encode())
                 tn.write(f"neighbor {neighbor['addr']} update-source Loopback 0\r".encode()) 
-                time.sleep(0.5)
+                time.sleep(0.3)
  
- 
+        if "ipv4" in routeur["BGP"]:
+            tn.write(b"end\r")  
+            tn.write(b"conf t\r")
+            tn.write(f"router bgp {AS}\r".encode())
+            tn.write(b"address-family ipv4\r")
+            neighbors=routeur["BGP"]["ipv4"]
+            for neighbor in neighbors:
+                tn.write(f"neighbor {neighbor['addr']} activate\r".encode())
+                time.sleep(0.3)
+            tn.write(b"end\r")
+
+        if "vpnv4" in routeur["BGP"]:
+            neighbors=routeur["BGP"]["vpnv4"]
+            tn.write(b"end\r")  
+            tn.write(b"conf t\r")
+            tn.write(f"router bgp {AS}\r".encode())
+            tn.write(b"address-family vpnv4\r")
+            for neighbor in neighbors:
+                tn.write(f"neighbor {neighbor['addr']} activate\r".encode())
+                # tn.write(f"neighbor {neighbor['addr']} send-community both\r".encode()) #PAS BESOIN ON IMPLEM DIRECT LES VRFS
+                time.sleep(0.3)
+            tn.write(b"end\r")
+
+        if "v_vrf" in routeur["BGP"]:
+            neighbors=routeur["BGP"]["v_vrf"]
+            tn.write(b"end\r")  
+            tn.write(b"conf t\r")
+            tn.write(f"router bgp {AS}\r".encode())
+            for neighbor in neighbors:
+                vrf_name=neighbor["VRF"]
+                voisins=neighbor["neighbors"]
+                tn.write(f"address-family ipv4 vrf {vrf_name}\r".encode())
+                for voisin in voisins:
+                    tn.write(f"neighbor {voisin['addr']} remote-as {voisin['AS']}\r".encode())
+                    tn.write(f"neighbor {voisin['addr']} activate\r".encode())
+                    time.sleep(0.3)
+                tn.write(b"exit-address-family\r")
+                time.sleep(0.3)
     # node.start()
 
 
