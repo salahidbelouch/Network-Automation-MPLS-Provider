@@ -13,7 +13,7 @@ server = gns3fy.Gns3Connector("http://10.36.67.183:3080")
 print(
     tabulate(
         server.projects_summary(is_print=False),
-        headers=["Project Name", "Project ID",
+        headers=["Project NAME", "Project ID",
                  "Total Nodes", "Total Links", "Status"],
     )
 )
@@ -123,7 +123,26 @@ for node in projet.nodes:
             tn.write(b"mpls label protocol ldp\r")
             tn.write(b"end\r")
 
+    #VRF
+     if "VRF" in routeur:
+        for VRF in routeur["VRF"]:
 
+            NAME=VRF["name"]
+            RD=VRF["rd"]
+            IMPORT=VRF["rt_import"] #on a mis que c'est une liste au cas ou y en a plusieurs
+            EXPORT=VRF["rt_export"]
+
+            tn.write(b"end\r")  
+            tn.write(b"conf t\r")
+            tn.write(f"vrf definition {NAME}\r".encode())
+            tn.write(f"rd {RD}\r".encode())
+            for rt_in in IMPORT:
+                tn.write(f"route-target import {rt_in}\r".encode())
+            for rt_out in EXPORT:
+                tn.write(f"route-target export {rt_out}\r".encode())
+            tn.write(b"address-family ipv4\r")
+            tn.write(b"end\r") 
+            time.sleep(0.7)
 
 
     #BGP
@@ -153,39 +172,43 @@ for node in projet.nodes:
             tn.write(b"conf t\r")
             tn.write(f"router bgp {AS}\r".encode())
             tn.write(b"address-family ipv4\r")
-            neighbors=routeur["BGP"]["ipv4"]
-            for neighbor in neighbors:
+            Neighbors=routeur["BGP"]["ipv4"]
+            for neighbor in Neighbors:
                 tn.write(f"neighbor {neighbor['addr']} activate\r".encode())
                 time.sleep(0.3)
             tn.write(b"end\r")
 
         if "vpnv4" in routeur["BGP"]:
-            neighbors=routeur["BGP"]["vpnv4"]
+            Neighbors=routeur["BGP"]["vpnv4"]
             tn.write(b"end\r")  
             tn.write(b"conf t\r")
             tn.write(f"router bgp {AS}\r".encode())
             tn.write(b"address-family vpnv4\r")
-            for neighbor in neighbors:
+            for neighbor in Neighbors:
                 tn.write(f"neighbor {neighbor['addr']} activate\r".encode())
                 # tn.write(f"neighbor {neighbor['addr']} send-community both\r".encode()) #PAS BESOIN ON IMPLEM DIRECT LES VRFS
                 time.sleep(0.3)
             tn.write(b"end\r")
 
         if "v_vrf" in routeur["BGP"]:
-            neighbors=routeur["BGP"]["v_vrf"]
+            Neighbors=routeur["BGP"]["v_vrf"]
             tn.write(b"end\r")  
             tn.write(b"conf t\r")
             tn.write(f"router bgp {AS}\r".encode())
-            for neighbor in neighbors:
-                vrf_name=neighbor["VRF"]
-                voisins=neighbor["neighbors"]
-                tn.write(f"address-family ipv4 vrf {vrf_name}\r".encode())
-                for voisin in voisins:
-                    tn.write(f"neighbor {voisin['addr']} remote-as {voisin['AS']}\r".encode())
-                    tn.write(f"neighbor {voisin['addr']} activate\r".encode())
+            for neighbor in Neighbors:
+                VRF_name=neighbor["VRF"]
+                neigh=neighbor["Neighbors"]
+                tn.write(f"address-family ipv4 vrf {VRF_name}\r".encode())
+                for neig in neigh:
+                    tn.write(f"neighbor {neig['addr']} remote-as {neig['AS']}\r".encode())
+                    tn.write(f"neighbor {neig['addr']} activate\r".encode())
                     time.sleep(0.3)
                 tn.write(b"exit-address-family\r")
                 time.sleep(0.3)
+    
+    tn.write(b"end\r")
+    tn.write(b"write\r")
+    tn.write(b"\r")
     # node.start()
 
 
