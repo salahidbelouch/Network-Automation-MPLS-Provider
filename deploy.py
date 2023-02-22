@@ -30,7 +30,7 @@ with open("topologyv3.json", "r") as topo:
 #### Gestion Projet GNS3
 # Ouvre projet
 
-projet = gns3fy.Project(name="PROJECT_test2", connector=server)
+projet = gns3fy.Project(name="PROJECT_test4", connector=server)
 
 # Get info
 
@@ -115,6 +115,15 @@ for node in projet.nodes:
             tn.write(b"ip ospf 10 area " +
                      bytes(str(int["OSPF"]), "utf-8")+b"\r")
             tn.write(b"end\r")
+            tn.write(b"conf t\r")
+            tn.write(b"router ospf 10\r")
+            if int["Interface"]=="Loopback0" :
+                tn.write(b"network "+bytes(int["Address"][0], "utf-8")+b"0.0.0.0 area "+bytes(str(int["OSPF"]), "utf-8")+b"\r")
+            else: # make the mask adaptable
+                tn.write(b"network "+bytes(int["Address"][0], "utf-8")+b" 0.0.0.255 area "+bytes(str(int["OSPF"]), "utf-8")+b"\r")
+            tn.write(b"end\r")
+
+
         
         #MPLS
 
