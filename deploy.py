@@ -5,8 +5,9 @@ from tabulate import tabulate
 import time
 import telnetlib
 
+
 ### Connect to the GNS3 server
-server = gns3fy.Gns3Connector("http://10.36.67.183:3080")
+server = gns3fy.Gns3Connector("http://10.56.46.211:3080")
 
 # Verif -----
 
@@ -29,12 +30,12 @@ with open("topologyv3.json", "r") as topo:
 #### Gestion Projet GNS3
 # Ouvre projet
 
-projet = gns3fy.Project(name="Nouveau", connector=server)
+projet = gns3fy.Project(name="PROJECT_test2", connector=server)
 
 # Get info
 
 projet.get()
-print(projet)
+#print(projet)
 
 # Variables projet
 id = projet.project_id
@@ -53,8 +54,8 @@ for template in server.get_templates():
 
 for node in projet.nodes:
     print(f"Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
-    tn = telnetlib.Telnet("10.36.67.183", node.console)
-    
+    tn = telnetlib.Telnet("10.56.46.211", node.console)
+    routeur=topo_data[node.name]
     #Première implem Initialisation 
 
     tn.write(b"\r")
@@ -64,24 +65,26 @@ for node in projet.nodes:
     tn.write(b"\r")
     tn.write(b"end\r")
     tn.write(b"conf t\r")
-    tn.write(f"hostname {router}\r".encode())
+    tn.write(f"hostname {routeur}\r".encode())
     tn.write(b"end\r")
     time.sleep(0.3)
 
     #Implementation OSPF par routeur
 
-    routeur=topo_data[node.name]
+    
     if "OSPF_id" in routeur:
         tn.write(b"conf t\r")
         tn.write(b"router ospf 10\r")
         tn.write(b"router id "+bytes(routeur["OSPF_id"], "utf-8") + b"\r")
         tn.write(b"end\r")
+        print("OSPF DONE")
     if "ipcef" in routeur:
         tn.write(b"end\r")  
         tn.write(b"conf t\r")
         tn.write(b"ip cef\r")
         tn.write(b"end\r")
         time.sleep(0.3)
+        print("ipcef DONE")
 
     # Implementation interface par interface des parametres
 
@@ -209,6 +212,7 @@ for node in projet.nodes:
     tn.write(b"end\r")
     tn.write(b"write\r")
     tn.write(b"\r")
+    print( " Router DONE ")
     # node.start()
 
 
