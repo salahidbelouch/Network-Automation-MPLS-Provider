@@ -122,19 +122,7 @@ if __name__ == '__main__':
                     b" "+bytes(int["Address"][1], "utf-8")+b"\r")
 
             tn.write(b"end\r")
-            
-            #OSPF
-            tn.write(b"conf t\r")
-            tn.write(b"router ospf 10\r")
-            if int["Interface"]=="Loopback0" :
-                tn.write(b"network "+bytes(int["Address"][0], "utf-8")+b"0.0.0.0 area "+bytes(str(int["OSPF"]), "utf-8")+b"\r")
-            else: # make the mask adaptable
-                tn.write(b"network "+bytes(int["Address"][0], "utf-8")+b" 0.0.0.255 area "+bytes(str(int["OSPF"]), "utf-8")+b"\r")
-            tn.write(b"end\r")
 
-
-        
-        #MPLS
 
             if "OSPF" in int:
                 tn.write(b"conf t\r")
@@ -142,7 +130,14 @@ if __name__ == '__main__':
                 tn.write(b"ip ospf 10 area " +
                         bytes(str(int["OSPF"]), "utf-8")+b"\r")
                 tn.write(b"end\r")
-            
+                tn.write(b"conf t\r")
+                tn.write(b"router ospf 10\r")
+                if int["Interface"]=="Loopback0" :
+                    tn.write(b"network "+bytes(int["Address"][0], "utf-8")+b"0.0.0.0 area "+bytes(str(int["OSPF"]), "utf-8")+b"\r")
+                else: # make the mask adaptable
+                    tn.write(b"network "+bytes(int["Address"][0], "utf-8")+b" 0.0.0.255 area "+bytes(str(int["OSPF"]), "utf-8")+b"\r")
+                tn.write(b"end\r")
+                
             #MPLS
 
             if "MPLS" in int:
