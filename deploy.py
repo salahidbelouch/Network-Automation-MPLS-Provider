@@ -6,7 +6,6 @@ import time
 import telnetlib
 
 
-<<<<<<< HEAD
 def AddingRemoveCE():
     task=input("add or remove a customer? ")
     name=input("name of customer (CE5 for ex.) ")
@@ -20,72 +19,6 @@ def AddingRemoveCE():
     vrf=input("vrf name: ")
     rd=input("Route distinguisher : ")
     rt=input("Route target : ")
-=======
-### Connect to the GNS3 server
-server = gns3fy.Gns3Connector("http://10.56.46.211:3080")
-
-# Verif -----
-
-print(
-    tabulate(
-        server.projects_summary(is_print=False),
-        headers=["Project NAME", "Project ID",
-                 "Total Nodes", "Total Links", "Status"],
-    )
-)
-
-#############################
-
-
-#### Lecture JSON
-
-with open("topologyv3.json", "r") as topo:
-    topo_data = json.load(topo)
-
-#### Gestion Projet GNS3
-# Ouvre projet
-
-projet = gns3fy.Project(name="PROJECT_test4", connector=server)
-
-# Get info
-
-projet.get()
-#print(projet)
-
-# Variables projet
-id = projet.project_id
-c7200 = 0
-
-projet.open()
-
-# Debug
-for template in server.get_templates():
-    if "c7200" in template["name"]:
-        print(f"Template: {template['name']} -- ID: {template['template_id']}")
-        c7200 = template['template_id']
-
-#### Ecriture sur routeurs 
-
-
-for node in projet.nodes:
-    print(f"Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
-    tn = telnetlib.Telnet("10.56.46.211", node.console)
-    routeur=topo_data[node.name]
-    #Première implem Initialisation 
-
-    tn.write(b"\r")
-    tn.write(b"end\r")
-    time.sleep(0.3)
-
-    tn.write(b"\r")
-    tn.write(b"end\r")
-    tn.write(b"conf t\r")
-    tn.write(f"hostname {routeur}\r".encode())
-    tn.write(b"end\r")
-    time.sleep(0.3)
-
-    #Implementation OSPF par routeur
->>>>>>> d5f5d55193a136e62170c479f4c3acf1c027d768
 
     
     
@@ -189,10 +122,8 @@ if __name__ == '__main__':
                     b" "+bytes(int["Address"][1], "utf-8")+b"\r")
 
             tn.write(b"end\r")
-<<<<<<< HEAD
             
             #OSPF
-=======
             tn.write(b"conf t\r")
             tn.write(b"router ospf 10\r")
             if int["Interface"]=="Loopback0" :
@@ -204,7 +135,6 @@ if __name__ == '__main__':
 
         
         #MPLS
->>>>>>> d5f5d55193a136e62170c479f4c3acf1c027d768
 
             if "OSPF" in int:
                 tn.write(b"conf t\r")
