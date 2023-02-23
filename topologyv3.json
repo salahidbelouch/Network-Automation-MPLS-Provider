@@ -301,7 +301,8 @@
                 "BGP": {
                     "AS": "2",
                     "redistribute":true,
-                    "Neighbors": [{"AS": 1,"addr": "10.0.1.2"}]
+                    "Neighbors": [{"AS": 1,"addr": "10.0.1.2"}],
+                    "ipv4": [{"addr": "10.0.1.2"}]
                 },
                 "ipcef": true
                 },
@@ -315,7 +316,8 @@
                 "BGP": {
                     "AS": "3",
                     "redistribute":true,
-                    "Neighbors": [{"AS": 1,"addr": "10.0.3.2"}]
+                    "Neighbors": [{"AS": 1,"addr": "10.0.3.2"}],
+                    "ipv4": [{"addr": "10.0.3.2"}]
                 },
                 "ipcef": true
                 },
@@ -329,7 +331,8 @@
                 "BGP": {
                     "AS": "3",
                     "redistribute":true,
-                    "Neighbors": [{"AS": 1,"addr": "10.0.5.2"}]
+                    "Neighbors": [{"AS": 1,"addr": "10.0.5.2"}],
+                    "ipv4": [{"addr": "10.0.5.2"}]
                 },
                 "ipcef": true
                 },
@@ -343,7 +346,8 @@
                 "BGP": {
                     "AS": "2",
                     "redistribute":true,
-                    "Neighbors": [{"AS": 1,"addr": "10.0.7.2"}]
+                    "Neighbors": [{"AS": 1,"addr": "10.0.7.2"}],
+                    "ipv4": [{"addr": "10.0.7.2"}]
                 },
                 "ipcef": true
                 }
