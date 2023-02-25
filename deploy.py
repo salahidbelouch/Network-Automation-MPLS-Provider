@@ -73,7 +73,10 @@ if __name__ == '__main__':
 
 
     for node in projet.nodes:
-        print(f"Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
+        if node.name not in topo_data: # nouveau routeur qui n'a pas de conf sur json
+            pass
+        print("#####################")
+        print(f"##### Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
         tn = telnetlib.Telnet("192.168.137.1", node.console)
         routeur=topo_data[node.name]
         #Première implem Initialisation 
@@ -94,7 +97,7 @@ if __name__ == '__main__':
         if "OSPF_id" in routeur:
             tn.write(b"conf t\r")
             tn.write(b"router ospf 10\r")
-            tn.write(b"router id "+bytes(routeur["OSPF_id"], "utf-8") + b"\r")
+            tn.write(b"router-id "+bytes(routeur["OSPF_id"], "utf-8") + b"\r")
             tn.write(b"end\r")
             print("OSPF DONE")
         if "ipcef" in routeur:
@@ -108,11 +111,13 @@ if __name__ == '__main__':
         # Implementation interface par interface des parametres
 
         for int in routeur["interfaces"]:
-
+            if int["Interface"]=="Loopback0":
+                print(int["Interface"]," : ", node.name)
+            else:
+                print(int["Interface"]," : ", node.name, "<->",int["With"])
             tn.write(b"\r")
             tn.write(b"enable\r")
-            time.sleep(0.3)
-            time.sleep(0.3)
+            time.sleep(0.8)
 
             tn.write(b"conf t\r")
             tn.write(b"int "+bytes(int["Interface"], "utf-8")+b"\r")
@@ -122,22 +127,26 @@ if __name__ == '__main__':
                     b" "+bytes(int["Address"][1], "utf-8")+b"\r")
 
             tn.write(b"end\r")
-
+            time.sleep(0.5)
 
             if "OSPF" in int:
                 tn.write(b"conf t\r")
                 tn.write(b"int "+bytes(int["Interface"], "utf-8")+b"\r")
-                tn.write(b"ip ospf 10 area " +
-                        bytes(str(int["OSPF"]), "utf-8")+b"\r")
+                # tn.write(b"ip ospf 10 area " +
+                        # bytes(str(int["OSPF"]), "utf-8")+b"\r")
                 tn.write(b"end\r")
                 tn.write(b"conf t\r")
                 tn.write(b"router ospf 10\r")
                 if int["Interface"]=="Loopback0" :
-                    tn.write(b"network "+bytes(int["Address"][0], "utf-8")+b"0.0.0.0 area "+bytes(str(int["OSPF"]), "utf-8")+b"\r")
+                    tn.write(b"network "+bytes(int["Address"][0], "utf-8")+b" 0.0.0.0 area "+bytes(str(int["OSPF"]), "utf-8")+b"\r")
                 else: # make the mask adaptable
                     tn.write(b"network "+bytes(int["Address"][0], "utf-8")+b" 0.0.0.255 area "+bytes(str(int["OSPF"]), "utf-8")+b"\r")
                 tn.write(b"end\r")
-                
+                if int["Interface"]=="Loopback0":
+                    print(int["Interface"]," : ", node.name,"OSPF DONE")
+                else:
+                    print(int["Interface"]," : ", node.name, "<->",int["With"],"OSPF DONE")
+                time.sleep(0.5)
             #MPLS
 
             if "MPLS" in int:
@@ -147,6 +156,11 @@ if __name__ == '__main__':
                 tn.write(b"mpls ip\r")
                 tn.write(b"mpls label protocol ldp\r")
                 tn.write(b"end\r")
+                if int["Interface"]=="Loopback0":
+                    print(int["Interface"]," : ", node.name,"MPLS DONE")
+                else:
+                    print(int["Interface"]," : ", node.name, "<->",int["With"],"MPLS DONE")
+                time.sleep(0.5)
 
         #VRF
         if "VRF" in routeur:
@@ -167,6 +181,7 @@ if __name__ == '__main__':
                 tn.write(b"address-family ipv4\r")
                 tn.write(b"end\r") 
                 time.sleep(0.7)
+                print(node.name,"VRF",NAME,"DONE")
 
 
         #BGP
@@ -189,19 +204,24 @@ if __name__ == '__main__':
                     tn.write(f"neighbor {neighbor['addr']} remote-as {neighbor['AS']}\r".encode())
                     time.sleep(0.3)
                     # tn.write(f"neighbor {neighbor['addr']} activate\r".encode())
-                    # tn.write(f"neighbor {neighbor['addr']} update-source loopback 0\r".encode()) 
+                    nAS=str(neighbor["AS"])
+                    if str(AS)==nAS:
+                        print("WE DO THAAAAAAAAAAAAAAAT")
+                        tn.write(f"neighbor {neighbor['addr']} update-source Loopback0\r".encode()) 
                     time.sleep(0.3)
+                print("BGP DONE")
     
             if "ipv4" in routeur["BGP"]:
                 tn.write(b"end\r")  
                 tn.write(b"conf t\r")
                 tn.write(f"router bgp {AS}\r".encode())
                 tn.write(b"address-family ipv4\r")
-                Neighbors=routeur["BGP"]["ipv4"]
-                for neighbor in Neighbors:
+                NeighborsIPV4=routeur["BGP"]["ipv4"]
+                for neighbor in NeighborsIPV4:
                     tn.write(f"neighbor {neighbor['addr']} activate\r".encode())
                     time.sleep(0.3)
                 tn.write(b"end\r")
+                print("IPV4 BGP ACTIVATED")
 
             if "vpnv4" in routeur["BGP"]:
                 Neighbors=routeur["BGP"]["vpnv4"]
@@ -211,10 +231,10 @@ if __name__ == '__main__':
                 tn.write(b"address-family vpnv4\r")
                 for neighbor in Neighbors:
                     tn.write(f"neighbor {neighbor['addr']} activate\r".encode())
-                    tn.write(f"neighbor {neighbor['addr']} update-source loopback 0\r".encode())
-                    # tn.write(f"neighbor {neighbor['addr']} send-community both\r".encode()) #PAS BESOIN ON IMPLEM DIRECT LES VRFS
+                    tn.write(f"neighbor {neighbor['addr']} send-community extended\r".encode()) #PAS BESOIN ON IMPLEM DIRECT LES VRFS
                     time.sleep(0.3)
                 tn.write(b"end\r")
+                print("VPNV4 BGP ACTIVATED")
 
             if "v_vrf" in routeur["BGP"]:
                 Neighbors=routeur["BGP"]["v_vrf"]
@@ -225,18 +245,23 @@ if __name__ == '__main__':
                     VRF_name=neighbor["VRF"]
                     neigh=neighbor["Neighbors"]
                     tn.write(f"address-family ipv4 vrf {VRF_name}\r".encode())
+                    tn.write(b"redistribute connected\r")
                     for neig in neigh:
                         tn.write(f"neighbor {neig['addr']} remote-as {neig['AS']}\r".encode())
                         tn.write(f"neighbor {neig['addr']} activate\r".encode())
                         time.sleep(0.3)
                     tn.write(b"exit-address-family\r")
                     time.sleep(0.3)
+                print("VRF BGP REDISTRIBUTION DONE")
         
+        
+        time.sleep(0.5)
         tn.write(b"end\r")
         tn.write(b"write\r")
         tn.write(b"\r")
-        print( " Router DONE ")
+        print( "##### Router",node.name," DONE ")
+        print("#####################")
         # node.start()
 
-    
+
     # connection :
