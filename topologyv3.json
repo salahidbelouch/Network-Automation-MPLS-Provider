@@ -140,27 +140,28 @@
                                 "OSPF": 0
                             },
                             {
-                                "Interface": "g1/0",
+                                "Interface": "g2/0",
                                 "With": "P1",
                                 "Address": ["10.0.0.2","255.255.255.0"],
                                 "OSPF": 0,
                                 "MPLS": true
                             },
                             {
-                                "Interface": "g2/0",
+                                "Interface": "g1/0",
                                 "With": "CE1",
-                                "Address": ["10.0.1.2","255.255.255.0"]
+                                "Address": ["10.0.1.2","255.255.255.0"],
+                                "VRF": "as2"
                             }
                         ],
                     "OSPF_id": "1.1.1.1",
                     "BGP": {
                         "AS": "1",
-                        "Neighbors": [{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "4.4.4.4"},{"AS": 2,"addr": "10.0.1.1"}],
-                        "ipv4": [{"addr": "10.0.1.1"}],
+                        "Neighbors": [{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "4.4.4.4"}],
+                        "ipv4": [],
                         "vpnv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"}],
                         "v_vrf": [
                         {"VRF": "as2",
-                        "Neighbors":[{"AS":"2","addr":"10.0.1.1"}]}]
+                        "State":true}]
                     },
                     "VRF": [
                         {
@@ -169,8 +170,17 @@
                         "rt_import": ["1:10"],
                         "rt_export": ["1:10"]
                         }],
+                        "RIP": {
+                            "vrf":{
+                                "name":"as2",
+                                "network":"10.0.1.0", 
+                                "redistribute": true
+                            }
+                            
+                        },
                     "ipcef": true
                         },
+        
             "PE2": {
                         "router_name": "PE2",
                         "interfaces":[
@@ -180,27 +190,28 @@
                                 "OSPF": 0
                             },
                             {
-                                "Interface": "g1/0",
+                                "Interface": "g2/0",
                                 "With": "P2",
                                 "Address": ["10.0.2.2","255.255.255.0"],
                                 "OSPF": 0,
                                 "MPLS": true
                             },
                             {
-                                "Interface": "g2/0",
+                                "Interface": "g1/0",
                                 "With": "CE2",
-                                "Address": ["10.0.3.2","255.255.255.0"]
+                                "Address": ["10.0.3.2","255.255.255.0"],
+                                "VRF": "as3"
                             }
                         ],
                     "OSPF_id": "2.2.2.2",
                     "BGP": {
                         "AS": "1",
-                        "Neighbors": [{"AS": 1,"addr": "1.1.1.1"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "4.4.4.4"},{"AS": 3,"addr": "10.0.3.1"}],
-                        "ipv4": [{"addr": "10.0.3.1"}],
+                        "Neighbors": [{"AS": 1,"addr": "1.1.1.1"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "4.4.4.4"}],
+                        "ipv4": [],
                         "vpnv4": [{"addr": "1.1.1.1"},{"addr": "3.3.3.3"},{"addr": "4.4.4.4"}],
                         "v_vrf": [
                         {"VRF": "as3",
-                        "Neighbors":[{"AS":"3","addr":"10.0.3.1"}]}]
+                        "State":true}]
                     },
                     "VRF": [
                         {
@@ -209,6 +220,14 @@
                         "rt_import": ["1:11"],
                         "rt_export": ["1:11"]
                         }],
+                        "RIP": {
+                            "vrf":{
+                                "name":"as3",
+                                "network":"10.0.3.0", 
+                                "redistribute": true
+                            }
+                            
+                        },
                     "ipcef": true
                         },
             "PE3": {
@@ -229,28 +248,38 @@
                             {
                                 "Interface": "g2/0",
                                 "With": "CE3",
-                                "Address": ["10.0.5.2","255.255.255.0"]
+                                "Address": ["10.0.5.2","255.255.255.0"],
+                                "VRF": "as3"
                             }
                         ],
                     "OSPF_id": "3.3.3.3",
                     "BGP": {
                         "AS": "1",
-                        "Neighbors": [{"AS": 1,"addr": "1.1.1.1"},{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "4.4.4.4"},{"AS": 3,"addr": "10.0.5.1"}],
-                        "ipv4": [{"addr": "10.0.5.1"}],
+                        "Neighbors": [{"AS": 1,"addr": "1.1.1.1"},{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "4.4.4.4"}],
+                        "ipv4": [],
                         "vpnv4": [{"addr": "1.1.1.1"},{"addr": "2.2.2.2"},{"addr": "4.4.4.4"}],
                         "v_vrf": [
                         {"VRF": "as3",
-                        "Neighbors":[{"AS":"3","addr":"10.0.5.1"}]}]
+                        "State":true}]
                     },
                     "VRF": [
                         {
                         "name": "as3",
-                        "rd": "1:11",
+                        "rd": "1:2",
                         "rt_import": ["1:11"],
                         "rt_export": ["1:11"]
                         }],
+                        "RIP": {
+                            "vrf":{
+                                "name":"as3",
+                                "network":"10.0.5.0", 
+                                "redistribute": true
+                            }
+                            
+                        },
                     "ipcef": true
                         },
+
             "PE4": {
                     "router_name": "PE4",
                     "interfaces":[
@@ -269,18 +298,19 @@
                         {
                             "Interface": "g2/0",
                             "With": "CE4",
-                            "Address": ["10.0.7.2","255.255.255.0"]
+                            "Address": ["10.0.7.2","255.255.255.0"],
+                            "VRF": "as2"
                         }
                     ],
                 "OSPF_id": "4.4.4.4",
                 "BGP": {
                     "AS": "1",
-                    "Neighbors": [{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "1.1.1.1"},{"AS": 2,"addr": "10.0.7.1"}],
-                    "ipv4": [{"addr": "10.0.7.1"}],
+                    "Neighbors": [{"AS": 1,"addr": "2.2.2.2"},{"AS": 1,"addr": "3.3.3.3"},{"AS": 1,"addr": "1.1.1.1"}],
+                    "ipv4": [],
                     "vpnv4": [{"addr": "2.2.2.2"},{"addr": "3.3.3.3"},{"addr": "1.1.1.1"}],
                     "v_vrf": [
                     {"VRF": "as2",
-                    "Neighbors":[{"AS":"2","addr":"10.0.7.1"}]}]
+                    "State":true}]
                 },
                 "VRF": [
                     {
@@ -289,66 +319,82 @@
                     "rt_import": ["1:10"],
                     "rt_export": ["1:10"]
                     }],
+                    "RIP": {
+                        "vrf":{
+                            "name":"as2",
+                            "network":"10.0.7.0", 
+                            "redistribute": true
+                        }
+                        
+                    },
                 "ipcef": true
                     },
         "CE1": {
                 "router_name": "CE1",
-                "interfaces":[{
+                "interfaces":[
+                    {
+                        "Interface": "Loopback0",
+                        "Address": ["10.10.10.10","255.255.255.255"]
+                    },
+                    {
                     "Interface": "g1/0",
                     "With": "PE1",
                     "Address": ["10.0.1.1","255.255.255.0"]
                           }],
-                "BGP": {
-                    "AS": "2",
-                    "redistribute":true,
-                    "Neighbors": [{"AS": 1,"addr": "10.0.1.2"}],
-                    "ipv4": [{"addr": "10.0.1.2"}]
+                "RIP": {
+                    "network": ["10.0.1.0"]
                 },
                 "ipcef": true
                 },
         "CE2": {
                 "router_name": "CE2",
-                "interfaces":[{
+                "interfaces":[
+                    {
+                        "Interface": "Loopback0",
+                        "Address": ["20.20.20.20","255.255.255.255"]
+                    },
+                    {
                     "Interface": "g1/0",
                     "With": "PE2",
                     "Address": ["10.0.3.1","255.255.255.0"]
                           }],
-                "BGP": {
-                    "AS": "3",
-                    "redistribute":true,
-                    "Neighbors": [{"AS": 1,"addr": "10.0.3.2"}],
-                    "ipv4": [{"addr": "10.0.3.2"}]
+                "RIP": {
+                    "network": ["10.0.3.0"]
                 },
                 "ipcef": true
                 },
         "CE3": {
                 "router_name": "CE3",
-                "interfaces":[{
+                "interfaces":[
+                    {
+                        "Interface": "Loopback0",
+                        "Address": ["30.30.30.30","255.255.255.255"]
+                    },
+                    {
                     "Interface": "g1/0",
                     "With": "PE3",
                     "Address": ["10.0.5.1","255.255.255.0"]
                           }],
-                "BGP": {
-                    "AS": "3",
-                    "redistribute":true,
-                    "Neighbors": [{"AS": 1,"addr": "10.0.5.2"}],
-                    "ipv4": [{"addr": "10.0.5.2"}]
+                "RIP": {
+                    "network": [ "10.0.5.0"]
                 },
                 "ipcef": true
                 },
         "CE4": {
                 "router_name": "CE4",
-                "interfaces":[{
+                "interfaces":[
+                    {
+                        "Interface": "Loopback0",
+                        "Address": ["40.40.40.40","255.255.255.255"]
+                    },
+                    {
                     "Interface": "g1/0",
                     "With": "PE4",
                     "Address": ["10.0.7.1","255.255.255.0"]
                           }],
-                "BGP": {
-                    "AS": "2",
-                    "redistribute":true,
-                    "Neighbors": [{"AS": 1,"addr": "10.0.7.2"}],
-                    "ipv4": [{"addr": "10.0.7.2"}]
-                },
+                "RIP": {
+                    "network": ["10.0.7.0"]
+                    },
                 "ipcef": true
                 }
             

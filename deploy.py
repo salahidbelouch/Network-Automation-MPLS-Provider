@@ -27,7 +27,7 @@ def AddingRemoveCE():
 
 if __name__ == '__main__':
     ### Connect to the GNS3 server
-    server = gns3fy.Gns3Connector("http://192.168.137.1:3080")
+    server = gns3fy.Gns3Connector("http://10.56.99.68:3080")
 
     # Verif -----
 
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     #### Gestion Projet GNS3
     # Ouvre projet
 
-    projet = gns3fy.Project(name="TEST2", connector=server)
+    projet = gns3fy.Project(name="KONF", connector=server)
 
     # Get info
 
@@ -77,7 +77,7 @@ if __name__ == '__main__':
             pass
         print("#####################")
         print(f"##### Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
-        tn = telnetlib.Telnet("192.168.137.1", node.console)
+        tn = telnetlib.Telnet("10.56.99.68", node.console)
         routeur=topo_data[node.name]
         #Première implem Initialisation 
 
@@ -125,7 +125,8 @@ if __name__ == '__main__':
 
             tn.write(b"ip add "+bytes(int["Address"][0], "utf-8") +
                     b" "+bytes(int["Address"][1], "utf-8")+b"\r")
-
+            if "VRF" in int:
+                tn.write(f"ip vrf forwarding {int['VRF']}\r".encode())
             tn.write(b"end\r")
             time.sleep(0.5)
 
@@ -178,20 +179,19 @@ if __name__ == '__main__':
                     tn.write(f"route-target import {rt_in}\r".encode())
                 for rt_out in EXPORT:
                     tn.write(f"route-target export {rt_out}\r".encode())
-                tn.write(b"address-family ipv4\r")
+                # tn.write(b"address-family ipv4\r")
                 tn.write(b"end\r") 
                 time.sleep(0.7)
                 print(node.name,"VRF",NAME,"DONE")
-
 
         #BGP
         if "BGP" in routeur:
             AS=routeur["BGP"]["AS"]
             tn.write(b"conf t\r")
             tn.write(f"router bgp {AS}\r".encode())
-            tn.write(b"bgp log-neighbor-changes\r")
-            if "redistribute" in routeur["BGP"]:
-                tn.write(b"redistribute connected\r")
+            # tn.write(b"bgp log-neighbor-changes\r")
+            # if "redistribute" in routeur["BGP"]:
+            #     tn.write(b"redistribute connected\r")
             tn.write(b"end\r")
             time.sleep(0.3)
 
@@ -201,12 +201,12 @@ if __name__ == '__main__':
                 tn.write(f"router bgp {AS}\r".encode())
                 Neighbors=routeur["BGP"]["Neighbors"]
                 for neighbor in Neighbors:
+                    # tn.write(f"network {neighbor['addr']} mask 255.255.255.0\r".encode())
                     tn.write(f"neighbor {neighbor['addr']} remote-as {neighbor['AS']}\r".encode())
                     time.sleep(0.3)
                     # tn.write(f"neighbor {neighbor['addr']} activate\r".encode())
                     nAS=str(neighbor["AS"])
                     if str(AS)==nAS:
-                        print("WE DO THAAAAAAAAAAAAAAAT")
                         tn.write(f"neighbor {neighbor['addr']} update-source Loopback0\r".encode()) 
                     time.sleep(0.3)
                 print("BGP DONE")
@@ -231,7 +231,7 @@ if __name__ == '__main__':
                 tn.write(b"address-family vpnv4\r")
                 for neighbor in Neighbors:
                     tn.write(f"neighbor {neighbor['addr']} activate\r".encode())
-                    tn.write(f"neighbor {neighbor['addr']} send-community extended\r".encode()) #PAS BESOIN ON IMPLEM DIRECT LES VRFS
+                    # tn.write(f"neighbor {neighbor['addr']} send-community extended\r".encode()) #PAS BESOIN ON IMPLEM DIRECT LES VRFS
                     time.sleep(0.3)
                 tn.write(b"end\r")
                 print("VPNV4 BGP ACTIVATED")
@@ -242,19 +242,43 @@ if __name__ == '__main__':
                 tn.write(b"conf t\r")
                 tn.write(f"router bgp {AS}\r".encode())
                 for neighbor in Neighbors:
+
                     VRF_name=neighbor["VRF"]
-                    neigh=neighbor["Neighbors"]
+                # neigh=neighbor["Neighbors"]
                     tn.write(f"address-family ipv4 vrf {VRF_name}\r".encode())
-                    tn.write(b"redistribute connected\r")
-                    for neig in neigh:
-                        tn.write(f"neighbor {neig['addr']} remote-as {neig['AS']}\r".encode())
-                        tn.write(f"neighbor {neig['addr']} activate\r".encode())
-                        time.sleep(0.3)
+                # tn.write(b"redistribute connected\r")
+                    tn.write(b"redistribute rip\r")
+                # for neig in neigh:
+                #     tn.write(f"neighbor {neig['addr']} remote-as {neig['AS']}\r".encode())
+                #     tn.write(f"neighbor {neig['addr']} activate\r".encode())
+                #     time.sleep(0.3)
                     tn.write(b"exit-address-family\r")
-                    time.sleep(0.3)
-                print("VRF BGP REDISTRIBUTION DONE")
+                time.sleep(0.3)
+                print("VRF REDISTRIBUTION DONE")
         
-        
+        #RIP
+        if "RIP" in routeur:
+            RIPconf=routeur["RIP"]
+            if "vrf" in RIPconf:
+                confVRF=RIPconf["vrf"]
+                tn.write(b"conf t\r")
+                tn.write(b"router rip\r")
+                tn.write(b"version 2\r")
+                tn.write(f"address-family ipv4 vrf {confVRF['name']}\r".encode())
+                tn.write(b"redistribute bgp 1 metric transparent\r")
+                tn.write(f"network {confVRF['network']}\r".encode())
+                tn.write(b"no auto-summary\r")
+                tn.write(b"exit-address-family\r")
+                tn.write(b"end\r")
+            if "network" in RIPconf:
+                confRIP=RIPconf["network"]
+                for net in confRIP:
+                    tn.write(b"conf t\r")
+                    tn.write(b"router rip\r")
+                    tn.write(b"version 2\r")
+                    tn.write(f"network {net}\r".encode())
+                    tn.write(b"end\r")
+
         time.sleep(0.5)
         tn.write(b"end\r")
         tn.write(b"write\r")
