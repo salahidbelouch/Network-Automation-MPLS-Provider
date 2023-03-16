@@ -35,8 +35,10 @@ def AddingRemoveCE(projet):
             print(f"##### Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
             tn = telnetlib.Telnet(ip, node.console)
             tn.write(b"\r")
+            tn.write(b"yes\r")
             time.sleep(16)
             time.sleep(0.3)
+            tn.write(b"\r")
             tn.write(b"enable\r")
             tn.write(b"\r")
             tn.write(b"conf t\r")
@@ -179,8 +181,11 @@ if __name__ == '__main__':
         routeur=topo_data[node.name]
         #Première implem Initialisation 
         tn.write(b"\r")
-        tn.write(b"no\r")
-        time.sleep(16)
+        tn.write(b"enable\r")
+        tn.write(b"\r")
+        tn.write(b"conf t\r")
+        tn.write(b"no ip domain-lookup\r")
+        time.sleep(0.5)
         tn.write(b"\r")
         tn.write(b"end\r")
         time.sleep(0.3)
@@ -200,6 +205,8 @@ if __name__ == '__main__':
         if "ipcef" in routeur:
             tn.write(b"\r")
             tn.write(b"conf t\r")
+            tn.write(b"no ip icmp rate-limit unreachable\r")
+            tn.write(b"ip tcp synwait-time 5")
             tn.write(b"ip cef\r")
             tn.write(b"end\r")
             time.sleep(0.3)
@@ -218,8 +225,6 @@ if __name__ == '__main__':
             tn.write(b"no shutdown\r")
             tn.write(b"ip add "+bytes(int["Address"][0], "utf-8") +
                     b" "+bytes(int["Address"][1], "utf-8")+b"\r")
-            if "VRF" in int:
-                tn.write(f"ip vrf forwarding {int['VRF']}\r".encode())
             tn.write(b"end\r")
             time.sleep(0.5)
             if "OSPF" in int:
@@ -350,10 +355,18 @@ if __name__ == '__main__':
                     tn.write(b"version 2\r")
                     tn.write(f"network {net}\r".encode())
                     tn.write(b"end\r")
+
+        for int in routeur["interfaces"]:
+            if "VRF" in int:
+                tn.write(b"conf t\r")
+                tn.write(b"int "+bytes(int["Interface"], "utf-8")+b"\r")
+                tn.write(f"ip vrf forwarding {int['VRF']}\r".encode())
+                tn.write(b"end\r")
         time.sleep(0.5)
         tn.write(b"end\r")
         tn.write(b"write\r")
         tn.write(b"\r")
+
         print( "##### Router",node.name," DONE ")
         print("#####################")
 
