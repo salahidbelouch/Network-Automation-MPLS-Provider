@@ -357,8 +357,8 @@ if __name__ == '__main__':
         tn.write(b"\r")
         print( "##### Router",node.name," DONE ")
         print("#####################")
-        print("\n\n You can now add a new Customer. Add a router manually in GNS3, name him, and respond to the next questions.")
-        print("If you don't want to add one, exit the program with Ctrl+C.")
 
     while True :
+        print("\n\n You can now add a new Customer. Add a router manually in GNS3, name him, and respond to the next questions.")
+        print("If you don't want to add one, exit the program with Ctrl+C.")
         AddingRemoveCE(projet)
