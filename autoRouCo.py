@@ -7,21 +7,36 @@ import telnetlib
 import sys
 
 
-def AddingRemoveCE():
-    task=input("add or remove a customer? ")
-    name=input("name of customer (CE5 for ex.) ")
-    PE=input("this customer is relarted to each PE? ")
+def AddingRemoveCE(projet):
+    # task=input("add or remove a customer? ")
+    name=input("Name of the new customer (CE5 for ex.) : ")
+    PE=input("This customer is going to be related to which PE? (PE1 for ex.) : ")
     # if task=="add":
     ipCE=input("What ip address should he have? ")
     ipPE=input("What is the PE ip address? ")
     intCE=input("What is the CE related interface? (default g1/0) ") or "g1/0"
     intPE=input("What is the PE related interface? (ex: g3/0) ") 
-    ASnum=input("AS number? ")
     vrf=input("vrf name: ")
     rd=input("Route distinguisher : ")
-    rt=input("Route target : ")
+    rt_imp=[]
+    rt_exp=[]
+    nb_import=int(input("Number of RT to import (default: 1): ") or "1")
+    nb_export=int(input("Number of RT to export (default: 1): ") or "1")
+    for i in range(nb_import):
+        rt_imp.append(input(" *  "+str(i)+"   Route target import : "))
+    for i in range(nb_export):
+        rt_exp.append(input(" *  "+str(i)+"   Route target export : "))
 
-    
+    for node in projet.nodes:
+        if node.name==name:
+            print(f"##### Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
+        tn = telnetlib.Telnet("10.56.99.68", node.console)
+        tn.write(b"\r")
+        tn.write(b"end\r")
+        time.sleep(0.3)
+
+        tn.write(b"\r")
+        tn.write(b"conf t\r")
     
     
     pass
@@ -87,7 +102,7 @@ if __name__ == '__main__':
     projet.open()
 
     if ((len(sys.argv) >= 2) and (sys.argv[1] == "addCE")):
-        AddingRemoveCE()
+        AddingRemoveCE(projet)
         exit()
 
     #### Ecriture sur routeurs 
@@ -311,4 +326,4 @@ if __name__ == '__main__':
         print("If you don't want to add one, exit the program with Ctrl+C.")
 
         while True :
-            AddingRemoveCE()
+            AddingRemoveCE(projet)
