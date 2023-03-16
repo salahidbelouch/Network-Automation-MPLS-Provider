@@ -27,7 +27,9 @@ def AddingRemoveCE(projet):
         rt_imp.append(input(" *  "+str(i)+"   Route target import : "))
     for i in range(nb_export):
         rt_exp.append(input(" *  "+str(i)+"   Route target export : "))
-
+    splitted=((ipCE.split('.'))[:-1])
+    splitted.append('0')
+    net='.'.join(splitted)
     for node in projet.nodes:
         if node.name==name:
             print(f"##### Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
@@ -35,10 +37,65 @@ def AddingRemoveCE(projet):
             tn.write(b"\r")
             tn.write(b"end\r")
             time.sleep(0.3)
-
             tn.write(b"\r")
             tn.write(b"conf t\r")
-    
+            tn.write(b"ip cef\r")
+            tn.write(b"end\r")
+            time.sleep(0.3)
+            tn.write(b"\r")
+            tn.write(b"enable\r")
+            time.sleep(0.8)
+            tn.write(b"conf t\r")
+            tn.write(b"int "+bytes(intCE, "utf-8")+b"\r")
+            tn.write(b"no shutdown\r")
+            tn.write(b"ip add "+bytes(ipCE, "utf-8") +
+                    b" "+bytes("255.255.255.0", "utf-8")+b"\r")
+            tn.write(b"conf t\r")
+            tn.write(b"router rip\r")
+            tn.write(b"version 2\r")
+            tn.write(f"network {net}\r".encode())
+            tn.write(b"end\r")
+            time.sleep(0.5)
+            tn.write(b"end\r")
+            tn.write(b"write\r")
+            tn.write(b"\r")
+            print("")
+        if node.name==PE:
+            tn = telnetlib.Telnet(ip, node.console)
+            tn.write(b"\r")
+            tn.write(b"end\r")
+            time.sleep(0.3)
+            tn.write(b"\r")
+            time.sleep(0.8)
+            tn.write(b"conf t\r")
+            tn.write(b"int "+bytes(intPE, "utf-8")+b"\r")
+            tn.write(b"no shutdown\r")
+            tn.write(b"ip add "+bytes(ipPE, "utf-8") +
+                    b" "+bytes("255.255.255.0", "utf-8")+b"\r")
+            tn.write(b"\r")
+            tn.write(b"conf t\r")
+            tn.write(f"ip vrf {vrf}\r".encode())
+            tn.write(f"rd {rd}\r".encode())
+            for rt_in in rt_imp:
+                tn.write(f"route-target import {rt_in}\r".encode())
+            for rt_out in rt_exp:
+                tn.write(f"route-target export {rt_out}\r".encode())
+            # tn.write(b"address-family ipv4\r")
+            tn.write(b"end\r") 
+            time.sleep(0.7)
+            print(node.name,"VRF",vrf,"DONE")
+            tn.write(b"conf t\r")
+            tn.write(b"router rip\r")
+            tn.write(b"version 2\r")
+            tn.write(f"address-family ipv4 vrf {vrf}\r".encode())
+            tn.write(b"redistribute bgp 1 metric transparent\r")
+            tn.write(f"network {net}\r".encode())
+            tn.write(b"no auto-summary\r")
+            tn.write(b"exit-address-family\r")
+            tn.write(b"end\r")
+
+        print( "##### Router",node.name," DONE ")
+        print("#####################")
     
     pass
 
