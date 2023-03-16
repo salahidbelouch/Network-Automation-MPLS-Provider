@@ -8,6 +8,7 @@ import sys
 
 
 def AddingRemoveCE(projet):
+    global ip
     # task=input("add or remove a customer? ")
     name=input("Name of the new customer (CE5 for ex.) : ")
     PE=input("This customer is going to be related to which PE? (PE1 for ex.) : ")
@@ -30,13 +31,13 @@ def AddingRemoveCE(projet):
     for node in projet.nodes:
         if node.name==name:
             print(f"##### Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
-        tn = telnetlib.Telnet("10.56.99.68", node.console)
-        tn.write(b"\r")
-        tn.write(b"end\r")
-        time.sleep(0.3)
+            tn = telnetlib.Telnet(ip, node.console)
+            tn.write(b"\r")
+            tn.write(b"end\r")
+            time.sleep(0.3)
 
-        tn.write(b"\r")
-        tn.write(b"conf t\r")
+            tn.write(b"\r")
+            tn.write(b"conf t\r")
     
     
     pass
@@ -44,6 +45,7 @@ def AddingRemoveCE(projet):
 
 
 def projectSelector():
+    global ip
     ip = input("\n The GNS3 Server IP is (for ex: 127.0.0.1) : ")
     server = gns3fy.Gns3Connector("http://"+ip+":3080")
 
@@ -114,23 +116,18 @@ if __name__ == '__main__':
 
         print("#####################")
         print(f"##### Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
-        tn = telnetlib.Telnet("10.56.99.68", node.console)
+        tn = telnetlib.Telnet(ip, node.console)
         routeur=topo_data[node.name]
         #Première implem Initialisation 
-
         tn.write(b"\r")
         tn.write(b"end\r")
         time.sleep(0.3)
-
         tn.write(b"\r")
         tn.write(b"conf t\r")
         tn.write(f"hostname {node.name}\r".encode())
         tn.write(b"end\r")
         time.sleep(0.3)
-
         #Implementation OSPF par routeur
-
-        
         if "OSPF_id" in routeur:
             tn.write(b"conf t\r")
             tn.write(b"router ospf 10\r")
@@ -144,9 +141,7 @@ if __name__ == '__main__':
             tn.write(b"end\r")
             time.sleep(0.3)
             print("ipcef DONE")
-
         # Implementation interface par interface des parametres
-
         for int in routeur["interfaces"]:
             if int["Interface"]=="Loopback0":
                 print(int["Interface"]," : ", node.name)
@@ -155,18 +150,15 @@ if __name__ == '__main__':
             tn.write(b"\r")
             tn.write(b"enable\r")
             time.sleep(0.8)
-
             tn.write(b"conf t\r")
             tn.write(b"int "+bytes(int["Interface"], "utf-8")+b"\r")
             tn.write(b"no shutdown\r")
-
             tn.write(b"ip add "+bytes(int["Address"][0], "utf-8") +
                     b" "+bytes(int["Address"][1], "utf-8")+b"\r")
             if "VRF" in int:
                 tn.write(f"ip vrf forwarding {int['VRF']}\r".encode())
             tn.write(b"end\r")
             time.sleep(0.5)
-
             if "OSPF" in int:
                 tn.write(b"conf t\r")
                 tn.write(b"int "+bytes(int["Interface"], "utf-8")+b"\r")
@@ -186,7 +178,6 @@ if __name__ == '__main__':
                     print(int["Interface"]," : ", node.name, "<->",int["With"],"OSPF DONE")
                 time.sleep(0.5)
             #MPLS
-
             if "MPLS" in int:
                 tn.write(b"conf t\r")
                 tn.write(b"ip cef t\r")
@@ -199,7 +190,6 @@ if __name__ == '__main__':
                 else:
                     print(int["Interface"]," : ", node.name, "<->",int["With"],"MPLS DONE")
                 time.sleep(0.5)
-
         #VRF
         if "VRF" in routeur:
             for VRF in routeur["VRF"]:
@@ -220,7 +210,6 @@ if __name__ == '__main__':
                 tn.write(b"end\r") 
                 time.sleep(0.7)
                 print(node.name,"VRF",NAME,"DONE")
-
         #BGP
         if "BGP" in routeur:
             AS=routeur["BGP"]["AS"]
@@ -231,7 +220,6 @@ if __name__ == '__main__':
             #     tn.write(b"redistribute connected\r")
             tn.write(b"end\r")
             time.sleep(0.3)
-
             if "Neighbors" in routeur["BGP"]:
                 tn.write(b"\r")
                 tn.write(b"conf t\r")
@@ -247,19 +235,6 @@ if __name__ == '__main__':
                         tn.write(f"neighbor {neighbor['addr']} update-source Loopback0\r".encode()) 
                     time.sleep(0.3)
                 print("BGP DONE")
-    
-            if "ipv4" in routeur["BGP"]:
-                tn.write(b"end\r")  
-                tn.write(b"conf t\r")
-                tn.write(f"router bgp {AS}\r".encode())
-                tn.write(b"address-family ipv4\r")
-                NeighborsIPV4=routeur["BGP"]["ipv4"]
-                for neighbor in NeighborsIPV4:
-                    tn.write(f"neighbor {neighbor['addr']} activate\r".encode())
-                    time.sleep(0.3)
-                tn.write(b"end\r")
-                print("IPV4 BGP ACTIVATED")
-
             if "vpnv4" in routeur["BGP"]:
                 Neighbors=routeur["BGP"]["vpnv4"]
                 tn.write(b"end\r")  
@@ -272,14 +247,12 @@ if __name__ == '__main__':
                     time.sleep(0.3)
                 tn.write(b"end\r")
                 print("VPNV4 BGP ACTIVATED")
-
             if "v_vrf" in routeur["BGP"]:
                 Neighbors=routeur["BGP"]["v_vrf"]
                 tn.write(b"end\r")  
                 tn.write(b"conf t\r")
                 tn.write(f"router bgp {AS}\r".encode())
                 for neighbor in Neighbors:
-
                     VRF_name=neighbor["VRF"]
                 # neigh=neighbor["Neighbors"]
                     tn.write(f"address-family ipv4 vrf {VRF_name}\r".encode())
@@ -292,7 +265,6 @@ if __name__ == '__main__':
                     tn.write(b"exit-address-family\r")
                 time.sleep(0.3)
                 print("VRF REDISTRIBUTION DONE")
-        
         #RIP
         if "RIP" in routeur:
             RIPconf=routeur["RIP"]
@@ -315,7 +287,6 @@ if __name__ == '__main__':
                     tn.write(b"version 2\r")
                     tn.write(f"network {net}\r".encode())
                     tn.write(b"end\r")
-
         time.sleep(0.5)
         tn.write(b"end\r")
         tn.write(b"write\r")
