@@ -4,6 +4,7 @@ from gns3fy import Node
 from tabulate import tabulate
 import time
 import telnetlib
+import sys
 
 
 def AddingRemoveCE():
@@ -53,29 +54,41 @@ def intro():
     print("| \(_)|_| |_(/_ |    \__(_)| | |  | __||_| | (_| |_(_) | ")
     print("               ############################    V.2")
     print("")
-    print("1.  Open the provided project in GNS3")
-    print("2.  Check in GNS3 the GNS3 Server IP")
-    print("3.  Launch the project, and wait approximatively for a minute (Time for Routers to boot)")
-    print("4.  Provide the program with this IP and the GNS3 Project Name")
-    print("5.  Wait for configuration to end")
-    print("6.  If you want to add another Costumer Edge Router (CE), add one manually in GNS3 and connect it to a PE Router ")
-    print("7.  Provide the program with the asked informations")
-    print("8.  Wait for this configuration to end, both new CE and PE will be configurated.")
-    print("9.  Don't close the program : You can repeat steps from step 6. here. ")
-    print("10. In case you stopped this program, you can launch it again: $ autoRouCo addCE instead of : $ autoRouCo ")
-    print("\n\nStarting.")
+    if ((len(sys.argv) >= 2) and (sys.argv[1] == "addCE")):
+        print("Starting in New Customer Mode")
+        print("You are only going to do configurations needed to add one custumer.")
+        print("If you want a total network configuration, run autoRouCo without arguments")
+        print("Steps for new ")
+        print("1.  Add one routeur manually in GNS3, name him CEx (where x is CE number) and connect it to a PE Router ")
+        print("2.  Provide the program with the asked informations")
+        print("3.  Wait for this configuration to end, both new CE and PE will be configurated.")
+    else:
+        print("1.  Open the provided project in GNS3")
+        print("2.  Check in GNS3 the GNS3 Server IP")
+        print("3.  Launch the project, and wait approximatively for a minute (Time for Routers to boot)")
+        print("4.  Provide the program with this IP and the GNS3 Project Name")
+        print("5.  Wait for configuration to end")
+        print("6.  If you want to add another Customer Edge Router (CE), add one manually in GNS3, name him CEx (where x is CE number) and connect it to a PE Router ")
+        print("7.  Provide the program with the asked informations")
+        print("8.  Wait for this configuration to end, both new CE and PE will be configurated.")
+        print("9.  Don't close the program : You can repeat steps from step 6. here. ")
+        print("10. In case you stopped this program, you can launch it again: $ python3 autoRouCo addCE instead of : $ python3 autoRouCo ")
+        print("\n\nStarting.\n")
 
 if __name__ == '__main__':
     intro()
-    
+
     with open("topologyv3.json", "r") as topo:
+
         topo_data = json.load(topo)
     
     projet = projectSelector()
     projet.get()
     projet.open()
 
-
+    if ((len(sys.argv) >= 2) and (sys.argv[1] == "addCE")):
+        AddingRemoveCE()
+        exit()
 
     #### Ecriture sur routeurs 
 
@@ -294,7 +307,8 @@ if __name__ == '__main__':
         tn.write(b"\r")
         print( "##### Router",node.name," DONE ")
         print("#####################")
-        # node.start()
+        print("\n\n You can now add a new Customer. Add a router manually in GNS3, name him, and respond to the next questions.")
+        print("If you don't want to add one, exit the program with Ctrl+C.")
 
-
-    # connection :
+        while True :
+            AddingRemoveCE()
