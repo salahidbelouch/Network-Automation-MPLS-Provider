@@ -35,6 +35,8 @@ def AddingRemoveCE(projet):
             print(f"##### Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
             tn = telnetlib.Telnet(ip, node.console)
             tn.write(b"\r")
+            tn.write(b"no\r")
+            time.sleep(16)
             tn.write(b"end\r")
             time.sleep(0.3)
             tn.write(b"\r")
@@ -176,6 +178,9 @@ if __name__ == '__main__':
         tn = telnetlib.Telnet(ip, node.console)
         routeur=topo_data[node.name]
         #Première implem Initialisation 
+        tn.write(b"\r")
+        tn.write(b"no\r")
+        time.sleep(16)
         tn.write(b"\r")
         tn.write(b"end\r")
         time.sleep(0.3)
@@ -353,5 +358,5 @@ if __name__ == '__main__':
         print("\n\n You can now add a new Customer. Add a router manually in GNS3, name him, and respond to the next questions.")
         print("If you don't want to add one, exit the program with Ctrl+C.")
 
-        while True :
-            AddingRemoveCE(projet)
+    while True :
+        AddingRemoveCE(projet)
