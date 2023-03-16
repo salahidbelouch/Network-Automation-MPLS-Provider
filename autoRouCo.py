@@ -35,7 +35,6 @@ def AddingRemoveCE(projet):
             print(f"##### Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
             tn = telnetlib.Telnet(ip, node.console)
             tn.write(b"\r")
-            tn.write(b"no\r")
             time.sleep(16)
             time.sleep(0.3)
             tn.write(b"enable\r")
