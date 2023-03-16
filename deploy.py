@@ -25,49 +25,56 @@ def AddingRemoveCE():
     
     pass
 
-if __name__ == '__main__':
-    ### Connect to the GNS3 server
-    server = gns3fy.Gns3Connector("http://10.56.99.68:3080")
+
+
+def projectSelector():
+    ip = input("\n The GNS3 Server IP is (for ex: 127.0.0.1) : ")
+    server = gns3fy.Gns3Connector("http://"+ip+":3080")
 
     # Verif -----
-
+    print("Here the list of all GNS3 projects opened : \n\n")
     print(
         tabulate(
             server.projects_summary(is_print=False),
-            headers=["Project NAME", "Project ID",
+            headers=["Project Name", "Project ID",
                     "Total Nodes", "Total Links", "Status"],
         )
     )
+    projet = input("\n The project you want to open is (please put the Project Name) : ")
+    project = gns3fy.Project(name=projet, connector=server)
+    return project
 
-    #############################
+def intro():
+    print("     _     _  __ _      /    _                            ")
+    print(" |V||_)---|_)/__|_)    /    |_|   _|_ _ __  _ _|_ _  _|   ")
+    print(" | ||     |_)\_||     /     | ||_| |_(_)|||(_| |_(/_(_|   ")
+    print(" _                    __        _    _                   ")
+    print("|_) _    _|_ _  __   /   _ __ _|_ o (_|    __ _ _|_ _  __")
+    print("| \(_)|_| |_(/_ |    \__(_)| | |  | __||_| | (_| |_(_) | ")
+    print("               ############################    V.2")
+    print("")
+    print("1. Open the provided project in GNS3")
+    print("2. Check in GNS3 the GNS3 Server IP")
+    print("3. Launch the project, and wait approximatively for a minute (Time for Routers to boot)")
+    print("4. Provide the program with this IP and the GNS3 Project Name")
+    print("5. Wait for configuration to end")
+    print("6. If you want to add another Costumer Edge Router (CE), add one manually in GNS3 and connect it to a PE Router ")
+    print("7. Provide the program with the asked informations")
+    print("8. Wait for this configuration to end, both new CE and PE will be configurated.")
+    print("9. Don't close the program : You can repeat steps from step 6. here. ")
+    print("\n\nStarting.")
 
-
-    #### Lecture JSON
-
+if __name__ == '__main__':
+    intro()
+    
     with open("topologyv3.json", "r") as topo:
         topo_data = json.load(topo)
-
-    #### Gestion Projet GNS3
-    # Ouvre projet
-
-    projet = gns3fy.Project(name="KONF", connector=server)
-
-    # Get info
-
+    
+    projet = projectSelector()
     projet.get()
-    #print(projet)
-
-    # Variables projet
-    id = projet.project_id
-    c7200 = 0
-
     projet.open()
 
-    # Debug
-    for template in server.get_templates():
-        if "c7200" in template["name"]:
-            print(f"Template: {template['name']} -- ID: {template['template_id']}")
-            c7200 = template['template_id']
+
 
     #### Ecriture sur routeurs 
 
@@ -75,6 +82,7 @@ if __name__ == '__main__':
     for node in projet.nodes:
         if node.name not in topo_data: # nouveau routeur qui n'a pas de conf sur json
             pass
+
         print("#####################")
         print(f"##### Node: {node.name} -- Node Type: {node.node_type} -- Status: {node.status} -- port {node.console} -- port {node.command_line}")
         tn = telnetlib.Telnet("10.56.99.68", node.console)
