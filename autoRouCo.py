@@ -63,7 +63,7 @@ def AddingRemoveCE(projet, topo_json):
             tn.write(b"end\r")
             tn.write(b"write\r")
             tn.write(b"\r")
-            print("")
+            print("New CE Configuration Done")
         if node.name==PE:
             aS=topo_json[PE]["BGP"]["AS"]
             tn = telnetlib.Telnet(ip, node.console)
