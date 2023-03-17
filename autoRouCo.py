@@ -7,7 +7,7 @@ import telnetlib
 import sys
 
 
-def AddingRemoveCE(projet):
+def AddingRemoveCE(projet, topo_json):
     global ip
     # task=input("add or remove a customer? ")
     name=input("Name of the new customer (CE5 for ex.) : ")
@@ -16,7 +16,7 @@ def AddingRemoveCE(projet):
     ipCE=input("What ip address should he have? ")
     ipPE=input("What is the PE ip address? ")
     intCE=input("What is the CE related interface? (default g1/0) ") or "g1/0"
-    intPE=input("What is the PE related interface? (ex: g3/0) ") 
+    intPE=input("What is the PE related interface? (ex: g3/0) ") or "g3/0"
     vrf=input("vrf name: ")
     rd=input("Route distinguisher : ")
     rt_imp=[]
@@ -65,17 +65,20 @@ def AddingRemoveCE(projet):
             tn.write(b"\r")
             print("")
         if node.name==PE:
+            aS=topo_json[PE]["BGP"]["AS"]
             tn = telnetlib.Telnet(ip, node.console)
             tn.write(b"\r")
             tn.write(b"end\r")
             time.sleep(0.3)
             tn.write(b"\r")
             time.sleep(0.8)
+            tn.write(b"enable\r")
             tn.write(b"conf t\r")
             tn.write(b"int "+bytes(intPE, "utf-8")+b"\r")
             tn.write(b"no shutdown\r")
             tn.write(b"ip add "+bytes(ipPE, "utf-8") +
                     b" "+bytes("255.255.255.0", "utf-8")+b"\r")
+            tn.write(b"end\r")
             tn.write(b"\r")
             tn.write(b"conf t\r")
             tn.write(f"ip vrf {vrf}\r".encode())
@@ -92,11 +95,32 @@ def AddingRemoveCE(projet):
             tn.write(b"router rip\r")
             tn.write(b"version 2\r")
             tn.write(f"address-family ipv4 vrf {vrf}\r".encode())
+            time.sleep(0.2)
             tn.write(b"redistribute bgp 1 metric transparent\r")
             tn.write(f"network {net}\r".encode())
+            time.sleep(0.2)
             tn.write(b"no auto-summary\r")
             tn.write(b"exit-address-family\r")
             tn.write(b"end\r")
+            tn.write(b"conf t\r")
+            time.sleep(0.2)
+            tn.write(b"int "+bytes(intPE, "utf-8")+b"\r")
+            tn.write(f"ip vrf forwarding {vrf}\r".encode())
+            time.sleep(0.2)
+            tn.write(b"ip add "+bytes(ipPE, "utf-8") +
+                    b" "+bytes("255.255.255.0", "utf-8")+b"\r")
+            tn.write(b"end\r")
+            tn.write(b"conf t\r")
+            time.sleep(0.2)
+            tn.write(f"router bgp {aS}\r".encode())
+            time.sleep(0.2)
+            tn.write(f"address-family ipv4 vrf {vrf}\r".encode())
+            tn.write(b"redistribute rip\r")
+            tn.write(b"exit-address-family\r")
+            time.sleep(0.3)
+            tn.write(b"end\r")
+            tn.write(b"write\r")
+            tn.write(b"\r")
 
         print( "##### Router",node.name," DONE ")
         print("#####################")
@@ -165,7 +189,7 @@ if __name__ == '__main__':
     projet.open()
 
     if ((len(sys.argv) >= 2) and (sys.argv[1] == "addCE")):
-        AddingRemoveCE(projet)
+        AddingRemoveCE(projet, topo_data)
         exit()
 
     #### Ecriture sur routeurs 
